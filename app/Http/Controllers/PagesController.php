@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Contact;
 use App\Demande;
+use App\Formation;
 use App\Mail\ContactFormMail;
+use App\Session;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
@@ -52,7 +54,8 @@ class PagesController extends Controller
     }
 
     public function preinscription() {
-        return view('preinscription');
+        $sessions = Session::all();
+        return view('preinscription',compact('sessions'));
     }
 
     public function reprenderpreinscription(Request $request) {
@@ -61,13 +64,26 @@ class PagesController extends Controller
             if (!$demande) {
                 return back()->with(['error' => 'Email Non utilisé']);
             }
-            return view('preinscription', compact('demande'));
+            $sessions = Session::all();
+            $formations = Formation::all();
+            $continue = Formation::where('type','=','continue')->first();
+            $specs = $continue->specialites;
+            $lparlee = [];
+            $lmaternelle = [];
+            if($demande->lmaternelle) {
+                $lparlee = json_decode($demande->lparlée, true);
+                $lmaternelle = json_decode($demande->lmaternelle, true);
+            }
+            return view('preinscription', compact('demande','sessions','formations','specs','lparlee','lmaternelle'));
         }
         return view('reprendre-preinscription');
     }
 
     public function newdemande(Request $request) {
-        Demande::updateOrCreate(['email' => $request->get('email')], $request->except('email'));
+        Demande::updateOrCreate(['email' => $request->get('email')], $request->except('email','lmaternelle','lparlée'));
+        $lmaternelle =  json_encode($request->lmaternelle,JSON_UNESCAPED_SLASHES);
+        $lparlee =  json_encode($request->lparlée,JSON_UNESCAPED_SLASHES);
+        Demande::updateOrCreate(['email' => $request->get('email')], ['lmaternelle' => $lmaternelle,'lparlée' => $lparlee]);
         return response()->json(['success' => 'Demande Enregistrée']);
 
     }
@@ -89,5 +105,24 @@ class PagesController extends Controller
             return response()->json(['type' => 'success', 'message' => 'Merci pour votre confiance ! , Un conseiller pédagogique vous contactera dés la réception de vos coordonnées']);
         }
         return response()->json(['type' => 'danger', 'message' => 'Desolé une erreur est survenue']);
+    }
+
+    public function formationsbytype($type) {
+        $formations = Formation::where('type','=',$type)->get();
+        return response()->json([
+            'success'=>1,
+            'formations' => $formations
+        ]);
+    }
+    public function specialitesbyformation($formation_id = null) {
+        if (!$formation_id) {
+            $formation = Formation::where('type','=','continue')->first();
+        } else {
+            $formation = Formation::find($formation_id);
+        }
+        return response()->json([
+            'success'=>1,
+            'specialites' => $formation->specialites
+        ]);
     }
 }

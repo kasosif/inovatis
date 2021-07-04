@@ -52,27 +52,6 @@
 
             <div class="navbar-custom-menu">
                 <ul class="nav navbar-nav">
-                    <!-- Notifications: style can be found in dropdown.less -->
-                    <li class="dropdown notifications-menu">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-bell-o"></i>
-                            {{--                            <span class="label label-warning">10</span>--}}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="header">You have 10 notifications</li>
-                            <li>
-                                <!-- inner menu: contains the actual data -->
-                                <ul class="menu">
-                                    <li>
-                                        <a href="#">
-                                            <i class="fa fa-users text-aqua"></i> 5 new members joined today
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="footer"><a href="#">View all</a></li>
-                        </ul>
-                    </li>
                     <!-- User Account: style can be found in dropdown.less -->
                     <li class="dropdown user user-menu">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -169,6 +148,49 @@
                         <li @yield('ajoutdemandesactive') >
                             <a href="{{route('backoffice.demande.ajout')}}">
                                 <i class="fa fa-circle-o"></i> Ajouter une demande
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="treeview @yield('sessionsopen') ">
+                    <a href="#">
+                        <i class="fa fa-calendar"></i>
+                        <span>Sessions</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu" @yield('displaysessions')>
+                        <li @yield('listesessionsactive') >
+                            <a href="{{route('backoffice.session.index')}}">
+                                <i class="fa fa-circle-o"></i> Liste des sessions
+                            </a>
+                        </li>
+                        <li @yield('ajoutsessionsactive') >
+                            <a href="{{route('backoffice.session.ajout')}}">
+                                <i class="fa fa-circle-o"></i> Ajouter une session
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="treeview @yield('formationsopen') ">
+                    <a href="#">
+                        <i class="fa fa-graduation-cap"></i>
+                        <span>Formations</span>
+                        <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                        </span>
+                    </a>
+                    <ul class="treeview-menu" @yield('displayformations')>
+                        <li @yield('listeformationsactive') >
+                            <a href="{{route('backoffice.formation.index')}}">
+                                <i class="fa fa-circle-o"></i> Liste des formations
+                            </a>
+                        </li>
+                        <li @yield('ajoutformationsactive') >
+                            <a href="{{route('backoffice.formation.ajout')}}">
+                                <i class="fa fa-circle-o"></i> Ajouter une formation
                             </a>
                         </li>
                     </ul>

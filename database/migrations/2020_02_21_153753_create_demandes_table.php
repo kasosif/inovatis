@@ -28,8 +28,8 @@ class CreateDemandesTable extends Migration
             $table->string('mois')->nullable();
             $table->string('annee')->nullable();
             $table->string('sexe')->nullable();
-            $table->string('lmaternelle')->nullable();
-            $table->string('lparlée')->nullable();
+            $table->longText('lmaternelle')->nullable();
+            $table->longText('lparlée')->nullable();
             $table->string('ppere')->nullable();
             $table->string('npere')->nullable();
             $table->string('pmere')->nullable();
@@ -41,6 +41,8 @@ class CreateDemandesTable extends Migration
             $table->string('dprogramme')->nullable();
             $table->string('lenseignement')->nullable();
             $table->string('ecomparative')->nullable();
+            $table->string('type_formation')->nullable();
+            $table->string('specialite')->nullable();
             $table->timestamps();
         });
     }

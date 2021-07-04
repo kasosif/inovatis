@@ -28,6 +28,8 @@ Route::get('preinscription/reprendre', 'PagesController@reprenderpreinscription'
 Route::post('preinscription/reprendre', 'PagesController@reprenderpreinscription')->name('reprendrepreinscription');
 
 Route::post('contact', 'PagesController@contact')->name('contact');
+Route::get('ajax/formationsbytype/{type?}', 'PagesController@formationsbytype')->name('ajax.formationsbytype');
+Route::get('ajax/specialitesbyformation/{formation_id?}', 'PagesController@specialitesbyformation')->name('ajax.specialitesbyformation');
 
 Auth::routes(['register'=> false]);
 
@@ -51,4 +53,22 @@ Route::group(['middleware' => 'auth','prefix' =>'admin'], function() {
     Route::get('/contacts', 'Backoffice\ContactController@index')->name('backoffice.contact.index');
     Route::get('/contacts/show/{id?}', 'Backoffice\ContactController@show')->name('backoffice.contact.show');
     Route::delete('/contacts/destroy/{id?}', 'Backoffice\ContactController@destroy')->name('backoffice.contact.destroy');
+
+    //sessions
+    Route::get('/sessions', 'Backoffice\SessionController@index')->name('backoffice.session.index');
+    Route::get('/sessions/ajout', 'Backoffice\SessionController@create')->name('backoffice.session.ajout');
+    Route::post('/sessions/store', 'Backoffice\SessionController@store')->name('backoffice.session.store');
+    Route::get('/sessions/edit/{id}', 'Backoffice\SessionController@edit')->name('backoffice.session.edit');
+    Route::put('/sessions/update/{id}', 'Backoffice\SessionController@update')->name('backoffice.session.update');
+    Route::delete('/sessions/destroy/{id?}', 'Backoffice\SessionController@destroy')->name('backoffice.session.destroy');
+
+    //formations
+    Route::get('/formations', 'Backoffice\FormationController@index')->name('backoffice.formation.index');
+    Route::get('/formations/ajout', 'Backoffice\FormationController@create')->name('backoffice.formation.ajout');
+    Route::post('/formations/store', 'Backoffice\FormationController@store')->name('backoffice.formation.store');
+    Route::get('/formations/show/{id}', 'Backoffice\FormationController@show')->name('backoffice.formation.show');
+    Route::get('/formations/edit/{id}', 'Backoffice\FormationController@edit')->name('backoffice.formation.edit');
+    Route::put('/formations/update/{id}', 'Backoffice\FormationController@update')->name('backoffice.formation.update');
+    Route::delete('/formations/destroy/{id?}', 'Backoffice\FormationController@destroy')->name('backoffice.formation.destroy');
+
 });

@@ -114,6 +114,9 @@
                                         <a href="{{route('home')}}#contact">Contactez nous</a>
                                     </li>
                                     <li class="menu-item ">
+                                        <a href="{{route('reprendrepreinscription')}}" style="margin-right: 5px;font-size:12px;background-color: #1b2e51;border-radius: 5px;padding: 16px;color: #fff" >
+                                            Se connecter
+                                        </a>
                                         <a href="{{route('preregistration')}}" style="font-size:12px;background-color: #1b2e51;border-radius: 5px;padding: 16px;color: #fff" >
                                             Pré-inscription En Ligne
                                         </a>

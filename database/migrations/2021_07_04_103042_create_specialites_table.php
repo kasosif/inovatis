@@ -17,7 +17,7 @@ class CreateSpecialitesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->bigInteger('formation_id')->unsigned()->nullable();
-            $table->foreign('formation_id')->references('id')->on('formations')->onDelete('set null');
+            $table->foreign('formation_id')->references('id')->on('formations')->onDelete('cascade');
             $table->timestamps();
         });
     }

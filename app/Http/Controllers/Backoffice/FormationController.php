@@ -37,8 +37,10 @@ class FormationController extends Controller
 
     public function update(Request $request, $id) {
         $formation = Formation::find($id);
-        $formation->name = $request->get('name');
-        $formation->save();
+        if ($formation->type == "initiale") {
+            $formation->name = $request->get('name');
+            $formation->save();
+        }
         foreach ($formation->specialites as $ss) {
             $ss->delete();
         }

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Backoffice;
 
 use App\Demande;
+use App\Formation;
 use App\Mail\DemandeAccepteMail;
 use App\Mail\DemandeRefuseMail;
+use App\Session;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
@@ -17,7 +19,9 @@ class DemandeController extends Controller
     }
 
     public function create() {
-        return view('backoffice.demandes.ajout');
+        $sessions = Session::all();
+        $formations = Formation::all();
+        return view('backoffice.demandes.ajout',compact('sessions','formations'));
     }
 
     public function store(Request $request) {
@@ -27,12 +31,25 @@ class DemandeController extends Controller
 
     public function edit($id) {
         $demande = Demande::find($id);
-        return view('backoffice.demandes.edit', compact('demande'));
+        $sessions = Session::all();
+        $formations = Formation::all();
+        $continue = Formation::where('type','=','continue')->first();
+        $specs = $continue->specialites;
+        $lparlee = [];
+        $lmaternelle = [];
+        if($demande->lmaternelle) {
+            $lparlee = json_decode($demande->lparlée, true);
+            $lmaternelle = json_decode($demande->lmaternelle, true);
+        }
+        return view('backoffice.demandes.edit', compact('demande','sessions','formations','specs','lparlee','lmaternelle'));
 
     }
 
     public function update(Request $request) {
-        Demande::updateOrCreate(['email' => $request->get('email')], $request->except('email'));
+        Demande::updateOrCreate(['email' => $request->get('email')], $request->except('email','lmaternelle','lparlée'));
+        $lmaternelle =  json_encode($request->lmaternelle,JSON_UNESCAPED_SLASHES);
+        $lparlee =  json_encode($request->lparlée,JSON_UNESCAPED_SLASHES);
+        Demande::updateOrCreate(['email' => $request->get('email')], ['lmaternelle' => $lmaternelle,'lparlée' => $lparlee]);
         return redirect()->route('backoffice.demande.index')->with('success','Demande Mise à jour !');
     }
 

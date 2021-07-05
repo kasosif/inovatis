@@ -1379,7 +1379,6 @@
             $('.js-formation-select').empty();
             $('.js-specialite-select').empty();
             let valeur = $(this).val();
-            console.log(valeur);
             if (valeur === "initiale") {
                 $.ajax({
                     url:"{{route('ajax.formationsbytype')}}" + '/' + valeur,

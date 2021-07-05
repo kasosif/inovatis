@@ -1,6 +1,12 @@
 @extends('backoffice.layout')
 @section('title') Modifier une Demande @endsection
 @section('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
 @endsection
 @section('demandesopen') menu-open @endsection
 @section('displaydemandes') style="display:block;" @endsection
@@ -28,43 +34,11 @@
         <div class="box-body">
             <div class="container-fluid">
                 <div class="form-wizard">
-                    <form action="" method="post" role="form" id="preregistration-form">
+                    <form action="{{route('backoffice.demande.update',['id' => $demande->id])}}" method="post" role="form" id="preregistration-form">
                         @csrf
+                        @method('put')
                         <fieldset class="wizard-fieldset">
-                            <legend>Choix du programme</legend>
-                            <div class="form-group">
-                                <label for="session">Session*</label>
-                                <select class="form-control wizard-required" id="session" name="session">
-                                    <option value="" selected>Session</option>
-                                    <option @if($demande->session == 'Hiver 2020') selected @endif value="Hiver 2020">Hiver 2020</option>
-                                    <option @if($demande->session == 'Automne 2020') selected @endif value="Automne 2020">Automne 2020</option>
-                                    <option @if($demande->session == 'Hiver 2021') selected @endif value="Hiver 2021">Hiver 2021</option>
-                                </select>
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="formation">Formation*</label>
-                                <select class="form-control wizard-required" id="formation" name="formation">
-                                    <option value="" selected>Formation</option>
-                                    <option @if($demande->formation == 'Formation 1') selected @endif value="Formation 1">Formation 1</option>
-                                    <option @if($demande->formation == 'Formation 2') selected @endif value="Formation 2">Formation 2</option>
-                                    <option @if($demande->formation == 'Formation 3') selected @endif value="Formation 3">Formation 3</option>
-                                </select>
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="programme">Choix de programme*</label>
-                                <select class="form-control wizard required" id="programme" name="programme">
-                                    <option value="" selected disabled>Choix de programme</option>
-                                    <option @if($demande->programme == 'Programme 1') selected @endif value="Programme 1">Programme 1</option>
-                                    <option @if($demande->programme == 'Programme 2') selected @endif value="Programme 2">Programme 2</option>
-                                    <option @if($demande->programme == 'Programme 3') selected @endif value="Programme 3">Programme 3</option>
-                                </select>
-                                <div class="wizard-form-error"></div>
-                            </div>
-                        </fieldset>
-                        <fieldset class="wizard-fieldset ">
-                            <legend>Informations de contact</legend>
+                            <h5>Informations de contact</h5>
                             <div class="form-group focus-input">
                                 <label for="prenom" class="wizard-form-text-label">Prénom*</label>
                                 <input type="text" class="form-control wizard-required" id="prenom" name="prenom" value="{{$demande->prenom}}">
@@ -75,23 +49,73 @@
                                 <input type="text" class="form-control wizard-required" id="nom" name="nom" value="{{$demande->nom}}">
                                 <div class="wizard-form-error"></div>
                             </div>
-                            <div class="form-group">
-                                <label for="email" class="wizard-form-text-label">Adresse Email*</label>
-                                <input type="email" class="form-control wizard-required" id="email" name="email" value="{{$demande->email}}">
-                                <div class="wizard-form-error"></div>
-                            </div>
+                            <input type="hidden" class="form-control wizard-required" id="email" name="email" value="{{$demande->email}}">
                             <div class="form-group focus-input">
                                 <label for="telephone" class="wizard-form-text-label">N° de téléphone mobile*</label>
                                 <input type="text" pattern="[0-9]{8}" class="form-control wizard-required" id="telephone" name="telephone" value="{{$demande->telephone}}">
                                 <div class="wizard-form-error"></div>
                             </div>
                         </fieldset>
-                        <fieldset class="wizard-fieldset ">
-                            <legend>Informations personnelles</legend>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <h3>Date de naissance</h3>
+                        <fieldset class="wizard-fieldset">
+                            <h5>Choix du programme</h5>
+                            <div class="form-group">
+                                <label for="session">Session*</label>
+                                <select class="form-control wizard-required" id="session" name="session">
+                                    <option value="" disabled>Session</option>
+                                    @foreach($sessions as $ss)
+                                        <option @if($demande->session == $ss->name) selected @endif value="{{$ss->name}}">{{$ss->name}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="wizard-form-error"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="type-formation">Formation*</label>
+                                <select class="form-control wizard-required" id="type-formation" name="type_formation">
+                                    <option value="" disabled>Formation</option>
+                                    <option @if($demande->type_formation == "initiale") selected @endif value="initiale">Formation Initiale</option>
+                                    <option @if($demande->type_formation == "continue") selected @endif value="continue">Formation Continue</option>
+                                </select>
+                                <div class="wizard-form-error"></div>
+                            </div>
+                            @if($demande->type_formation == "continue")
+                                <div class="form-group js-formation-select"></div>
+                                <div class="form-group js-specialite-select">
+                                    <label for="specialite">Choix de spécialité*</label>
+                                    <select class="form-control wizard required" id="specialite" name="specialite">
+                                        <option value="" selected disabled>Choix de programme</option>
+                                        @foreach($specs as $spec)
+                                            <option @if($spec->name == $demande->specialite) selected @endif value="{{$spec->name}}">{{$spec->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="wizard-form-error"></div>
                                 </div>
+                            @else
+                                <div class="form-group js-formation-select">
+                                    <label for="programme">Choix de programme*</label>
+                                    <select class="form-control wizard required" id="programme" name="programme">
+                                        <option value="" selected disabled>Choix de programme</option>
+                                        @foreach(\App\Formation::where('type','!=','continue')->get() as $f)
+                                            <option @if($f->name == $demande->programme) selected @endif value="{{$f->name}}">{{$f->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="wizard-form-error"></div>
+                                </div>
+                                <div class="form-group js-specialite-select">
+                                    <label for="specialite">Choix de spécialité*</label>
+                                    <select class="form-control wizard required" id="specialite" name="specialite">
+                                        <option value="" selected disabled>Choix de programme</option>
+                                        @foreach(\App\Formation::where('name','=',$demande->programme)->first()->specialites as $spec)
+                                            <option @if($spec->name == $demande->specialite) selected @endif value="{{$spec->name}}">{{$spec->name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="wizard-form-error"></div>
+                                </div>
+                            @endif
+                        </fieldset>
+                        <fieldset class="wizard-fieldset">
+                            <h5>Informations personnelles</h5>
+                            <div class="row">
+                                <div class="col-12">Date de naissance</div>
                                 <div class="col-lg-4 col-md-4 col-sm-4">
                                     <div class="form-group">
                                         <label for="jour">Jour*</label>
@@ -133,7 +157,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <h3>Sexe</h3>
+                                Sexe
                                 <div class="wizard-form-radio">
                                     <input name="sexe" id="radio1" type="radio" value="Masculin"  @if($demande->sexe == 'Masculin') checked @endif>
                                     <label for="radio1">Masculin</label>
@@ -145,61 +169,28 @@
                             </div>
 
                             <div class="form-group">
-                                <h3>Langue maternelle</h3>
-                                <div class="wizard-form-radio">
-                                    <input name="lmaternelle" id="radio3" type="radio" value="Francais" @if($demande->lmaternelle == 'Francais') checked @endif >
-                                    <label for="radio3">Français</label>
-                                </div>
-                                <div class="wizard-form-radio">
-                                    <input name="lmaternelle" id="radio4" type="radio" value="Anglais" @if($demande->lmaternelle == 'Anglais') checked @endif >
-                                    <label for="radio4">Anglais</label>
-                                </div>
-
-                                <div class="wizard-form-radio">
-                                    <input name="lmaternelle" id="radio5" type="radio" value="Autre" @if($demande->lmaternelle == 'Autre') checked @endif >
-                                    <label for="radio5">Autre</label>
-                                </div>
+                                <label for="lmaternelle">Langue maternelle</label>
+                                <select class="form-control wizard-required select2" id="lmaternelle" name="lmaternelle[]" multiple>
+                                    <option @if(in_array("Anglais",$lmaternelle)) selected @endif value="Anglais">Anglais</option>
+                                    <option @if(in_array("Francais",$lmaternelle)) selected @endif value="Francais">Français</option>
+                                    <option @if(in_array("Arabe",$lmaternelle)) selected @endif value="Arabe">Arabe</option>
+                                    <option @if(in_array("Autre",$lmaternelle)) selected @endif value="Autre">Autre</option>
+                                </select>
+                                <div class="wizard-form-error"></div>
                             </div>
-
                             <div class="form-group">
-                                <h3>Langue parlée</h3>
-                                <div class="wizard-form-radio">
-                                    <input name="lparlée" id="radio6" type="radio" value="Francais" @if($demande->lparlée == 'Francais') checked @endif >
-                                    <label for="radio3">Français</label>
-                                </div>
-                                <div class="wizard-form-radio">
-                                    <input name="lparlée" id="radio7" type="radio" value="Anglais" @if($demande->lparlée == 'Anglais') checked @endif >
-                                    <label for="radio4">Anglais</label>
-                                </div>
-
-                                <div class="wizard-form-radio">
-                                    <input name="lparlée" id="radio8" type="radio" value="Autre" @if($demande->lparlée == 'Autre') checked @endif >
-                                    <label for="radio5">Autre</label>
-                                </div>
-                            </div>
-                            <div class="form-group focus-input">
-                                <label for="brname" class="wizard-form-text-label">Prénom du père*</label>
-                                <input type="text" class="form-control wizard-required" id="brname" name="ppere" value="{{$demande->ppere}}">
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group focus-input">
-                                <label for="acname" class="wizard-form-text-label">Nom de famille du père*</label>
-                                <input type="text" class="form-control wizard-required" id="acname" name="npere" value="{{$demande->npere}}">
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group focus-input">
-                                <label for="acon" class="wizard-form-text-label">Prénom de la mère*</label>
-                                <input type="text" class="form-control wizard-required" id="acon" name="pmere" value="{{$demande->pmere}}">
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group focus-input">
-                                <label for="bname" class="wizard-form-text-label">Nom de jeune fille de la mère*</label>
-                                <input type="text" class="form-control wizard-required" id="bname" name="nmere" value="{{$demande->nmere}}">
+                                <label for="lparlée">Langue parlée</label>
+                                <select class="form-control wizard-required select2" id="lparlée" name="lparlée[]" multiple>
+                                    <option @if(in_array("Anglais",$lparlee)) selected @endif value="Anglais">Anglais</option>
+                                    <option @if(in_array("Francais",$lparlee)) selected @endif value="Francais">Français</option>
+                                    <option @if(in_array("Arabe",$lparlee)) selected @endif value="Arabe">Arabe</option>
+                                    <option @if(in_array("Autre",$lparlee)) selected @endif value="Autre">Autre</option>
+                                </select>
                                 <div class="wizard-form-error"></div>
                             </div>
                         </fieldset>
-                        <fieldset class="wizard-fieldset ">
-                            <legend>Études précédentes</legend>
+                        <fieldset class="wizard-fieldset">
+                            <h5>Études précédentes</h5>
 
                             <div class="form-group">
                                 <label for="paysetude">Pays d'études*</label>
@@ -447,11 +438,6 @@
                             </div>
 
                             <div class="form-group focus-input">
-                                <label for="dicipline" class="wizard-form-text-label">Discipline ou programme*</label>
-                                <input type="text" class="form-control wizard-required" id="dicipline" name="dicipline" value="{{$demande->dicipline}}">
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group focus-input">
                                 <label for="etablissment" class="wizard-form-text-label">Établissement*</label>
                                 <input type="text" class="form-control wizard-required" id="etablissment" name="etablissement" value="{{$demande->etablissement}}">
                                 <div class="wizard-form-error"></div>
@@ -466,41 +452,9 @@
                                 <input type="number" max="10"  min="1" class="form-control wizard-required" id="duree" name="dprogramme" value="{{$demande->dprogramme}}">
                                 <div class="wizard-form-error"></div>
                             </div>
-                            <div class="form-group">
-                                <h3>Langue d'enseignement</h3>
-                                <div class="wizard-form-radio">
-                                    <input name="lenseignement" id="radi1o3" type="radio" value="Francais" @if($demande->lenseignement == 'Francais') checked @endif>
-                                    <label for="radi1o3">Français</label>
-                                </div>
-                                <div class="wizard-form-radio">
-                                    <input name="lenseignement" id="radi1o4" type="radio" value="Anglais" @if($demande->lenseignement == 'Anglais') checked @endif>
-                                    <label for="radi1o4">Anglais</label>
-                                </div>
-
-                                <div class="wizard-form-radio">
-                                    <input name="lenseignement" id="radi1o5" type="radio" value="Autre" @if($demande->lenseignement == 'Autre') checked @endif>
-                                    <label for="radi1o5">Autre</label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <h3>Évaluation comparative</h3>
-                                <div class="wizard-form-radio">
-                                    <input name="ecomparative" id="radi2o3" type="radio" value="Je la possède déjà" @if($demande->ecomparative == 'je la possède déjà') checked @endif >
-                                    <label for="radi2o3">Je la possède déjà</label>
-                                </div>
-                                <div class="wizard-form-radio">
-                                    <input name="ecomparative" id="radi2o4" type="radio" value="Demande en cours" @if($demande->ecomparative == 'Demande en cours') checked @endif >
-                                    <label for="radi2o4">Demande en cours</label>
-                                </div>
-
-                                <div class="wizard-form-radio">
-                                    <input name="ecomparative" id="radi2o5" type="radio" value="Demande non débutée" @if($demande->ecomparative == 'Demande non débutée') checked @endif >
-                                    <label for="radi2o5">Demande non débutée</label>
-                                </div>
-                            </div>
                         </fieldset>
-                        <fieldset class="wizard-fieldset ">
-                            <legend>Paiement frais d'admission</legend>
+                        <fieldset class="wizard-fieldset">
+                            <h5>Paiement frais d'admission</h5>
                             <div class="alert alert-warning">
                                 <p>
                                     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusantium aperiam asperiores cumque deleniti deserunt dignissimos dolorem eaque enim esse facere, impedit maiores, nobis, optio placeat quas quasi sint tempora velit?
@@ -523,4 +477,84 @@
 
 @endsection
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function (){
+            $('.select2').select2({
+                placeholder: "Selectionnez Langue(s)",
+            });
+        });
+    </script>
+    <script>
+        $('body').on('change','#type-formation',function (){
+            $('.js-formation-select').empty();
+            $('.js-specialite-select').empty();
+            let valeur = $(this).val();
+            if (valeur === "initiale") {
+                $.ajax({
+                    url:"{{route('ajax.formationsbytype')}}" + '/' + valeur,
+                    method:"GET",
+                    success: function (res) {
+                        if (res.success === 1) {
+                            let opts = '';
+                            $.each(res.formations,function (i,v) {
+                                opts+= '<option data-id="'+ v.id +'" value="'+ v.name +'">'+ v.name +'</option>';
+                            });
+                            $('.js-formation-select').html(`
+                                <label for="programme">Choix de programme*</label>
+                                <select class="form-control wizard required" id="programme" name="programme">
+                                    <option value="" selected disabled>Choix de programme</option>
+                                    `+ opts +`
+                                </select>
+                                <div class="wizard-form-error"></div>`);
+
+                        }
+                    }
+                });
+            } else {
+                $.ajax({
+                    url:"{{route('ajax.specialitesbyformation')}}",
+                    method:"GET",
+                    success: function (res) {
+                        if (res.success === 1) {
+                            let opts = '';
+                            $.each(res.specialites,function (i,v) {
+                                opts+= '<option value="'+ v.name +'">'+ v.name +'</option>';
+                            });
+                            $('.js-specialite-select').html(`
+                                <label for="specialite">Choix de spécialité*</label>
+                                <select class="form-control wizard required" id="specialite" name="specialite">
+                                    <option value="" selected disabled>Choix de spécialité</option>
+                                    `+ opts +`
+                                </select>
+                                <div class="wizard-form-error"></div>`);
+
+                        }
+                    }
+                });
+            }
+        });
+        $('body').on('change','#programme',function (){
+            $.ajax({
+                url:"{{route('ajax.specialitesbyformation')}}" + '/' + $(this).children("option:selected").attr('data-id'),
+                method:"GET",
+                success: function (res) {
+                    if (res.success === 1) {
+                        let opts = '';
+                        $.each(res.specialites,function (i,v) {
+                            opts+= '<option value="'+ v.name +'">'+ v.name +'</option>';
+                        });
+                        $('.js-specialite-select').html(`
+                                <label for="specialite">Choix de spécialité*</label>
+                                <select class="form-control wizard required" id="specialite" name="specialite">
+                                    <option value="" selected disabled>Choix de spécialité</option>
+                                    `+ opts +`
+                                </select>
+                                <div class="wizard-form-error"></div>`);
+
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

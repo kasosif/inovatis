@@ -1,6 +1,12 @@
 @extends('backoffice.layout')
 @section('title') Ajouter une Demande @endsection
 @section('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container {
+            width: 100% !important;
+        }
+    </style>
 @endsection
 @section('demandesopen') menu-open @endsection
 @section('displaydemandes') style="display:block;" @endsection
@@ -23,41 +29,8 @@
         <div class="box-body">
             <div class="container-fluid">
                 <div class="form-wizard">
-                    <form action="" method="post" role="form" id="preregistration-form">
+                    <form action="{{route('backoffice.formation.store')}}" method="post" role="form" id="preregistration-form">
                         @csrf
-                        <fieldset class="wizard-fieldset">
-                            <legend>Choix du programme</legend>
-                            <div class="form-group">
-                                <label for="session">Session*</label>
-                                <select class="form-control wizard-required" id="session" name="session">
-                                    <option value="" selected>Session</option>
-                                    <option value="Hiver 2020">Hiver 2020</option>
-                                    <option value="Automne 2020">Automne 2020</option>
-                                    <option value="Hiver 2021">Hiver 2021</option>
-                                </select>
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="formation">Formation*</label>
-                                <select class="form-control wizard-required" id="formation" name="formation">
-                                    <option value="" selected>Formation</option>
-                                    <option value="Formation 1">Formation 1</option>
-                                    <option value="Formation 2">Formation 2</option>
-                                    <option value="Formation 3">Formation 3</option>
-                                </select>
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="programme">Choix de programme*</label>
-                                <select class="form-control wizard required" id="programme" name="programme">
-                                    <option value="" selected disabled>Choix de programme</option>
-                                    <option value="Programme 1">Programme 1</option>
-                                    <option value="Programme 2">Programme 2</option>
-                                    <option value="Programme 3">Programme 3</option>
-                                </select>
-                                <div class="wizard-form-error"></div>
-                            </div>
-                        </fieldset>
                         <fieldset class="wizard-fieldset">
                             <legend>Informations de contact</legend>
                             <div class="form-group">
@@ -82,11 +55,35 @@
                             </div>
                         </fieldset>
                         <fieldset class="wizard-fieldset">
+                            <legend>Choix du programme</legend>
+                            <div class="form-group">
+                                <label for="session">Session*</label>
+                                <select class="form-control wizard-required" id="session" name="session">
+                                    <option value="" selected>Session</option>
+                                    @foreach($sessions as $s)
+                                        <option value="{{$s->name}}">{{$s->name}}</option>
+                                    @endforeach
+                                </select>
+                                <div class="wizard-form-error"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="type-formation">Formation*</label>
+                                <select class="form-control wizard-required" id="type-formation" name="type_formation">
+                                    <option value="" selected disabled>Formation</option>
+                                    <option value="initiale">Formation Initiale</option>
+                                    <option value="continue">Formation Continue</option>
+                                </select>
+                                <div class="wizard-form-error"></div>
+                            </div>
+                            <div class="form-group js-formation-select">
+                            </div>
+                            <div class="form-group js-specialite-select">
+                            </div>
+                        </fieldset>
+                        <fieldset class="wizard-fieldset">
                             <legend>Informations personnelles</legend>
                             <div class="row">
-                                <div class="col-md-12">
-                                    <h3>Date de naissance</h3>
-                                </div>
+                                <div class="col-12">Date de naissance</div>
                                 <div class="col-lg-4 col-md-4 col-sm-4">
                                     <div class="form-group">
                                         <label for="jour">Jour*</label>
@@ -156,7 +153,7 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <h3>Sexe</h3>
+                                Sexe
                                 <div class="wizard-form-radio">
                                     <input name="sexe" id="radio1" type="radio" value="Masculin">
                                     <label for="radio1">Masculin</label>
@@ -166,63 +163,30 @@
                                     <label for="radio2">Feminin</label>
                                 </div>
                             </div>
-
                             <div class="form-group">
-                                <h3>Langue maternelle</h3>
-                                <div class="wizard-form-radio">
-                                    <input name="lmaternelle" id="radio3" type="radio" value="Francais">
-                                    <label for="radio3">Français</label>
-                                </div>
-                                <div class="wizard-form-radio">
-                                    <input name="lmaternelle" id="radio4" type="radio" value="Anglais">
-                                    <label for="radio4">Anglais</label>
-                                </div>
-
-                                <div class="wizard-form-radio">
-                                    <input name="lmaternelle" id="radio5" type="radio" value="Autre">
-                                    <label for="radio5">Autre</label>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <h3>Langue parlée</h3>
-                                <div class="wizard-form-radio">
-                                    <input name="lparlée" id="radio6" type="radio" value="Francais">
-                                    <label for="radio3">Français</label>
-                                </div>
-                                <div class="wizard-form-radio">
-                                    <input name="lparlée" id="radio7" type="radio" value="Anglais">
-                                    <label for="radio4">Anglais</label>
-                                </div>
-
-                                <div class="wizard-form-radio">
-                                    <input name="lparlée" id="radio8" type="radio" value="Autre">
-                                    <label for="radio5">Autre</label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="brname" class="wizard-form-text-label">Prénom du père*</label>
-                                <input type="text" class="form-control wizard-required" id="brname" name="ppere">
+                                <label for="lmaternelle">Langue maternelle</label>
+                                <select class="form-control wizard-required select2" id="lmaternelle" name="lmaternelle[]" multiple>
+                                    <option value="Anglais">Anglais</option>
+                                    <option value="Francais">Français</option>
+                                    <option value="Arabe">Arabe</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
                                 <div class="wizard-form-error"></div>
                             </div>
                             <div class="form-group">
-                                <label for="acname" class="wizard-form-text-label">Nom de famille du père*</label>
-                                <input type="text" class="form-control wizard-required" id="acname" name="npere">
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="acon" class="wizard-form-text-label">Prénom de la mère*</label>
-                                <input type="text" class="form-control wizard-required" id="acon" name="pmere">
-                                <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group">
-                                <label for="bname" class="wizard-form-text-label">Nom de jeune fille de la mère*</label>
-                                <input type="text" class="form-control wizard-required" id="bname" name="nmere">
+                                <label for="lparlée">Langue parlée</label>
+                                <select class="form-control wizard-required select2" id="lparlée" name="lparlée[]" multiple>
+                                    <option value="Anglais">Anglais</option>
+                                    <option value="Francais">Français</option>
+                                    <option value="Arabe">Arabe</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
                                 <div class="wizard-form-error"></div>
                             </div>
                         </fieldset>
                         <fieldset class="wizard-fieldset">
                             <legend>Études précédentes</legend>
+
                             <div class="form-group">
                                 <label for="paysetude">Pays d'études*</label>
                                 <select class="form-control wizard-required" id="paysetude" name="pays">
@@ -467,11 +431,7 @@
                                 </select>
                                 <div class="wizard-form-error"></div>
                             </div>
-                            <div class="form-group">
-                                <label for="dicipline" class="wizard-form-text-label">Discipline ou programme*</label>
-                                <input type="text" class="form-control wizard-required" id="dicipline" name="dicipline">
-                                <div class="wizard-form-error"></div>
-                            </div>
+
                             <div class="form-group">
                                 <label for="etablissment" class="wizard-form-text-label">Établissement*</label>
                                 <input type="text" class="form-control wizard-required" id="etablissment" name="etablissement">
@@ -486,38 +446,6 @@
                                 <label for="duree" class="wizard-form-text-label">Durée du programme*(en année)</label>
                                 <input type="number" max="10"  min="1" class="form-control wizard-required" id="duree" name="dprogramme">
                                 <div class="wizard-form-error"></div>
-                            </div>
-                            <div class="form-group">
-                                <h3>Langue d'enseignement</h3>
-                                <div class="wizard-form-radio">
-                                    <input name="lenseignement" id="radi1o3" type="radio" value="Francais">
-                                    <label for="radi1o3">Français</label>
-                                </div>
-                                <div class="wizard-form-radio">
-                                    <input name="lenseignement" id="radi1o4" type="radio" value="Anglais">
-                                    <label for="radi1o4">Anglais</label>
-                                </div>
-
-                                <div class="wizard-form-radio">
-                                    <input name="lenseignement" id="radi1o5" type="radio" value="Autre">
-                                    <label for="radi1o5">Autre</label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <h3>Évaluation comparative</h3>
-                                <div class="wizard-form-radio">
-                                    <input name="ecomparative" id="radi2o3" type="radio" value="Je la possède déjà">
-                                    <label for="radi2o3">Je la possède déjà</label>
-                                </div>
-                                <div class="wizard-form-radio">
-                                    <input name="ecomparative" id="radi2o4" type="radio" value="Demande en cours">
-                                    <label for="radi2o4">Demande en cours</label>
-                                </div>
-
-                                <div class="wizard-form-radio">
-                                    <input name="ecomparative" id="radi2o5" type="radio" value="Demande non débutée">
-                                    <label for="radi2o5">Demande non débutée</label>
-                                </div>
                             </div>
                         </fieldset>
                         <fieldset class="wizard-fieldset">
@@ -544,4 +472,84 @@
 
 @endsection
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function (){
+            $('.select2').select2({
+                placeholder: "Selectionnez Langue(s)",
+            });
+        });
+    </script>
+    <script>
+        $('body').on('change','#type-formation',function (){
+            $('.js-formation-select').empty();
+            $('.js-specialite-select').empty();
+            let valeur = $(this).val();
+            if (valeur === "initiale") {
+                $.ajax({
+                    url:"{{route('ajax.formationsbytype')}}" + '/' + valeur,
+                    method:"GET",
+                    success: function (res) {
+                        if (res.success === 1) {
+                            let opts = '';
+                            $.each(res.formations,function (i,v) {
+                                opts+= '<option data-id="'+ v.id +'" value="'+ v.name +'">'+ v.name +'</option>';
+                            });
+                            $('.js-formation-select').html(`
+                                <label for="programme">Choix de programme*</label>
+                                <select class="form-control wizard required" id="programme" name="programme">
+                                    <option value="" selected disabled>Choix de programme</option>
+                                    `+ opts +`
+                                </select>
+                                <div class="wizard-form-error"></div>`);
+
+                        }
+                    }
+                });
+            } else {
+                $.ajax({
+                    url:"{{route('ajax.specialitesbyformation')}}",
+                    method:"GET",
+                    success: function (res) {
+                        if (res.success === 1) {
+                            let opts = '';
+                            $.each(res.specialites,function (i,v) {
+                                opts+= '<option value="'+ v.name +'">'+ v.name +'</option>';
+                            });
+                            $('.js-specialite-select').html(`
+                                <label for="specialite">Choix de spécialité*</label>
+                                <select class="form-control wizard required" id="specialite" name="specialite">
+                                    <option value="" selected disabled>Choix de spécialité</option>
+                                    `+ opts +`
+                                </select>
+                                <div class="wizard-form-error"></div>`);
+
+                        }
+                    }
+                });
+            }
+        });
+        $('body').on('change','#programme',function (){
+            $.ajax({
+                url:"{{route('ajax.specialitesbyformation')}}" + '/' + $(this).children("option:selected").attr('data-id'),
+                method:"GET",
+                success: function (res) {
+                    if (res.success === 1) {
+                        let opts = '';
+                        $.each(res.specialites,function (i,v) {
+                            opts+= '<option value="'+ v.name +'">'+ v.name +'</option>';
+                        });
+                        $('.js-specialite-select').html(`
+                                <label for="specialite">Choix de spécialité*</label>
+                                <select class="form-control wizard required" id="specialite" name="specialite">
+                                    <option value="" selected disabled>Choix de spécialité</option>
+                                    `+ opts +`
+                                </select>
+                                <div class="wizard-form-error"></div>`);
+
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

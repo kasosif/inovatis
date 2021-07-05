@@ -58,8 +58,6 @@ Route::group(['middleware' => 'auth','prefix' =>'admin'], function() {
     Route::get('/sessions', 'Backoffice\SessionController@index')->name('backoffice.session.index');
     Route::get('/sessions/ajout', 'Backoffice\SessionController@create')->name('backoffice.session.ajout');
     Route::post('/sessions/store', 'Backoffice\SessionController@store')->name('backoffice.session.store');
-    Route::get('/sessions/edit/{id}', 'Backoffice\SessionController@edit')->name('backoffice.session.edit');
-    Route::put('/sessions/update/{id}', 'Backoffice\SessionController@update')->name('backoffice.session.update');
     Route::delete('/sessions/destroy/{id?}', 'Backoffice\SessionController@destroy')->name('backoffice.session.destroy');
 
     //formations

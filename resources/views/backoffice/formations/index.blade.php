@@ -1,14 +1,14 @@
 @extends('backoffice.layout')
-@section('title') Liste des sessions @endsection
+@section('title') Liste des formations @endsection
 @section('css')
     <link rel="stylesheet" href="{{ asset('backoffice/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css') }}">
     <!-- iziToast alert -->
     <link rel="stylesheet" type="text/css" href="{{asset('backoffice/bower_components/iziToast/dist/css/iziToast.min.css')}}">
 @endsection
-@section('sessionsopen') menu-open @endsection
-@section('displaysessions') style="display:block;" @endsection
-@section('listesessionsactive') class="active" @endsection
-@section('headtitle') Liste des sessions @endsection
+@section('formationsopen') menu-open @endsection
+@section('displayformations') style="display:block;" @endsection
+@section('listeformationsactive') class="active" @endsection
+@section('headtitle') Liste des formations @endsection
 @section('breadcrumb')
     <li>
         <a href="{{route('backoffice.index')}}">
@@ -16,8 +16,8 @@
         </a>
     </li>
     <li class="active" >
-        <a href="{{route('backoffice.session.index')}}">
-            <i class="fa fa-calendar"></i> Liste des sessions
+        <a href="{{route('backoffice.formation.index')}}">
+            <i class="fa fa-calendar"></i> Liste des formations
         </a>
     </li>
 @endsection
@@ -27,29 +27,34 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-xs-12">
-                        @if($sessions->count() == 0)
+                        @if($formations->count() == 0)
                             <div class="alert alert-warning">
-                                Aucune Session trouvée...
+                                Aucune Formation trouvée...
                             </div>
                         @else
                             <div class="box-body table-responsive no-padding">
-                                <table id="sessionstable" class="table table-hover">
+                                <table id="formationstable" class="table table-hover">
                                     <thead>
                                     <tr>
                                         <th>Réference</th>
                                         <th>Nom</th>
+                                        <th>Nb spécialites</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($sessions as $s)
+                                    @foreach($formations as $s)
                                         <tr>
                                             <td>{{ $s->id }}</td>
                                             <td>{{ $s->name }}</td>
+                                            <td>{{ $s->specialites()->count() }} spécialité(s)</td>
                                             <td>
-                                                <button class="btn btn-danger btn-sm" value="show" onclick="toggleSupp({{ $s->id }})"><i class="fa fa-trash">
-                                                    </i> Supprimer Session
-                                                </button>
+                                                <a href="{{route('backoffice.formation.edit',['id' => $s->id])}}" class="btn btn-primary btn-sm"><i class="fa fa-pencil fa-fw"> </i>Mise à jour</a>
+                                                @if($s->type == "initiale")
+                                                    <button class="btn btn-danger btn-sm" value="show" onclick="toggleSupp({{ $s->id }})"><i class="fa fa-trash">
+                                                        </i> Supprimer Formation
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -74,7 +79,7 @@
                     <h4 class="modal-title">Operation de Suppression</h4>
                 </div>
                 <div class="modal-body">
-                    <h3>Etes vous sûr de Supprimer cette Session !!?</h3>
+                    <h3>Etes vous sûr de Supprimer cette Formation !!?</h3>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Annuler</button>
@@ -104,7 +109,7 @@
             position: 'topCenter'
         });
         @endif
-        $('#sessionstable').DataTable({
+        $('#formationstable').DataTable({
             'paging'      : true,
             'lengthChange': false,
             'searching'   : true,
@@ -114,7 +119,7 @@
             'pageLength': 5
         });
         function toggleSupp(id) {
-            $('#deletelink').attr('action','{{ route('backoffice.session.destroy') }}'+'/'+id);
+            $('#deletelink').attr('action','{{ route('backoffice.formation.destroy') }}'+'/'+id);
             $("#modalsupp").modal('show');
         }
     </script>

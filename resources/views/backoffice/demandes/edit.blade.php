@@ -104,9 +104,11 @@
                                     <label for="specialite">Choix de spécialité*</label>
                                     <select class="form-control wizard required" id="specialite" name="specialite">
                                         <option value="" selected disabled>Choix de programme</option>
-                                        @foreach(\App\Formation::where('name','=',$demande->programme)->first()->specialites as $spec)
-                                            <option @if($spec->name == $demande->specialite) selected @endif value="{{$spec->name}}">{{$spec->name}}</option>
-                                        @endforeach
+                                        @if(\App\Formation::where('name','=',$demande->programme)->first())
+                                            @foreach(\App\Formation::where('name','=',$demande->programme)->first()->specialites as $spec)
+                                                <option @if($spec->name == $demande->specialite) selected @endif value="{{$spec->name}}">{{$spec->name}}</option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                     <div class="wizard-form-error"></div>
                                 </div>

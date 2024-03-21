@@ -1,6 +1,6 @@
 # Inovatis website
 
-Website for professional training center with signup and prepay wizard
+Website for professional training center with signup and preregistration wizard
 
 ## Tech Stack
 
